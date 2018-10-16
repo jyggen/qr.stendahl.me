@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	cacheSince = time.Now().Format(http.TimeFormat)
+	cacheSince = time.Date(2018, time.October, 17, 0, 0, 0, 0, time.UTC).Format(http.TimeFormat)
 	cacheUntil = time.Now().AddDate(60, 0, 0).Format(http.TimeFormat)
 	randomRunes = []rune("1234567890")
 )
