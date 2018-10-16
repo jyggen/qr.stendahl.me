@@ -12,9 +12,7 @@ import (
 	"strconv"
 )
 
-const landingUrl = "https://qr.stendahl.me/mRgTTRaywA"
-
-var randomRunes = []rune("123456789")
+var randomRunes = []rune("1234567890")
 
 func randomString(n int) string {
 	b := make([]rune, n)
@@ -91,6 +89,6 @@ func main() {
 
 	r.HandleFunc("/", handleLandingRequest)
 	r.HandleFunc("/1234567890", handleFinalRequest)
-	r.HandleFunc("/{random:[0-9a-zA-Z]{10}}", handleRandomRequest)
+	r.HandleFunc("/{random:[\\d]{10}}", handleRandomRequest)
 	log.Fatal(http.ListenAndServe("127.0.0.1:8283", r))
 }
