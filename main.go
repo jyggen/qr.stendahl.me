@@ -10,9 +10,14 @@ import (
 	"math/rand"
 	"net/http"
 	"strconv"
+	"time"
 )
 
-var randomRunes = []rune("1234567890")
+var (
+	cacheSince = time.Now().Format(http.TimeFormat)
+	cacheUntil = time.Now().AddDate(60, 0, 0).Format(http.TimeFormat)
+	randomRunes = []rune("1234567890")
+)
 
 func randomString(n int) string {
 	b := make([]rune, n)
@@ -33,12 +38,8 @@ func handleLandingRequest(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleRandomRequest(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	seed, err := strconv.Atoi(vars["random"])
-
-	if err != nil {
-		panic(err)
-	}
+	seed, err := strconv.Atoi(mux.Vars(r)["random"])
+	if err != nil { panic(err) }
 
 	handleRequest(w, string(getRandomQrCode(int64(seed))))
 }
@@ -48,9 +49,12 @@ func handleRequest(w http.ResponseWriter, qrCode string) {
 	hasher.Write([]byte(qrCode))
 	hash := hasher.Sum(nil)
 
-	w.Header().Set("ETag", fmt.Sprintf("%x\n", hash))
-	w.Header().Set("Content-Type", "image/png")
 	w.Header().Set("Cache-Control", "public, max-age=31536000")
+	w.Header().Set("Content-Length", strconv.Itoa(len([]byte(qrCode))))
+	w.Header().Set("Content-Type", "image/png")
+	w.Header().Set("ETag", fmt.Sprintf("%x\n", hash))
+	w.Header().Set("Expires", cacheUntil)
+	w.Header().Set("Last-Modified", cacheSince)
 
 	fmt.Fprint(w, qrCode)
 }
@@ -63,10 +67,7 @@ func getRandomQrCode(seed int64) []byte {
 
 func getQrCode(url string) []byte {
 	qr, err := qrcode.New(url, qrcode.Highest)
-
-	if err != nil {
-		panic(err)
-	}
+	if err != nil { panic(err) }
 
 	qr.ForegroundColor = color.RGBA{
 		R: uint8(rand.Intn(100)),
@@ -76,10 +77,7 @@ func getQrCode(url string) []byte {
 	}
 
 	png, err := qr.PNG(512)
-
-	if err != nil {
-		panic(err)
-	}
+	if err != nil { panic(err) }
 
 	return png
 }
