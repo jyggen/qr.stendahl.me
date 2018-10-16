@@ -15,7 +15,7 @@ import (
 
 var (
 	cacheSince = time.Date(2018, time.October, 17, 0, 0, 0, 0, time.UTC).Format(http.TimeFormat)
-	cacheUntil = time.Now().AddDate(60, 0, 0).Format(http.TimeFormat)
+	cacheUntil = time.Now().AddDate(1, 0, 0).Format(http.TimeFormat)
 	randomRunes = []rune("1234567890")
 )
 
@@ -34,7 +34,9 @@ func handleFinalRequest(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleLandingRequest(w http.ResponseWriter, r *http.Request) {
-	handleRequest(w, string(getRandomQrCode(0)))
+	rand.Seed(0)
+
+	http.Redirect(w, r, "/" + randomString(10) + ".png", http.StatusMovedPermanently)
 }
 
 func handleRandomRequest(w http.ResponseWriter, r *http.Request) {
@@ -62,7 +64,7 @@ func handleRequest(w http.ResponseWriter, qrCode string) {
 func getRandomQrCode(seed int64) []byte {
 	rand.Seed(seed)
 
-	return getQrCode("https://qr.stendahl.me/" + randomString(10))
+	return getQrCode("https://qr.stendahl.me/" + randomString(10) + ".png")
 }
 
 func getQrCode(url string) []byte {
@@ -86,7 +88,7 @@ func main() {
 	r := mux.NewRouter()
 
 	r.HandleFunc("/", handleLandingRequest)
-	r.HandleFunc("/1234567890", handleFinalRequest)
-	r.HandleFunc("/{random:[\\d]{10}}", handleRandomRequest)
+	r.HandleFunc("/1234567890.png", handleFinalRequest)
+	r.HandleFunc("/{random:[\\d]{10}}.png", handleRandomRequest)
 	log.Fatal(http.ListenAndServe("127.0.0.1:8283", r))
 }
