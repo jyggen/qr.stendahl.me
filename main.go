@@ -30,7 +30,7 @@ func randomString(n int) string {
 }
 
 func handleFinalRequest(w http.ResponseWriter, r *http.Request) {
-	handleRequest(w, string(getQrCode("https://www.youtube.com/watch?v=dQw4w9WgXcQ")))
+	http.Redirect(w, r, "https://www.youtube.com/watch?v=dQw4w9WgXcQ", http.StatusMovedPermanently)
 }
 
 func handleLandingRequest(w http.ResponseWriter, r *http.Request) {
@@ -88,7 +88,7 @@ func main() {
 	r := mux.NewRouter()
 
 	r.HandleFunc("/", handleLandingRequest)
-	r.HandleFunc("/1234567890.png", handleFinalRequest)
+	r.HandleFunc("/3932972241.png", handleFinalRequest)
 	r.HandleFunc("/{random:[\\d]{10}}.png", handleRandomRequest)
 	log.Fatal(http.ListenAndServe("127.0.0.1:8283", r))
 }
