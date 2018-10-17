@@ -88,7 +88,7 @@ func main() {
 	r := mux.NewRouter()
 
 	r.HandleFunc("/", handleLandingRequest)
-	r.HandleFunc("/3932972241.png", handleFinalRequest)
+	r.HandleFunc("/6093924234.png", handleFinalRequest)
 	r.HandleFunc("/{random:[\\d]{10}}.png", handleRandomRequest)
 	log.Fatal(http.ListenAndServe("127.0.0.1:8283", r))
 }
